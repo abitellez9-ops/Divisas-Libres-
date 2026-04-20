@@ -5,246 +5,449 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Divisas Libres & Crypto</title>
     
-    <!-- PWA Settings -->
     <meta name="theme-color" content="#f59e0b">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;700;900&family=DM+Mono:wght@500&display=swap" rel="stylesheet">
     
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
-        
+        :root {
+            --green: #10b981;
+            --green-bg: #f0fdf4;
+            --green-border: #6ee7b7;
+            --amber: #f59e0b;
+            --amber-bg: #fffbeb;
+            --amber-border: #fcd34d;
+            --dark: #0f172a;
+            --muted: #64748b;
+            --surface: #f8fafc;
+            --card-shadow: 0 32px 64px -12px rgba(15,23,42,0.07), 0 0 0 1px rgba(15,23,42,0.04);
+        }
+
+        * { box-sizing: border-box; }
+
         body {
-            background-color: #f8fafc;
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: var(--surface);
+            font-family: 'DM Sans', system-ui, sans-serif;
             display: flex;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
             margin: 0;
             padding: 1.25rem;
+            background-image: radial-gradient(circle at 20% 20%, rgba(16,185,129,0.06) 0%, transparent 50%),
+                              radial-gradient(circle at 80% 80%, rgba(245,158,11,0.06) 0%, transparent 50%);
         }
+
         .app-card {
             background: white;
-            border-radius: 3rem;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08);
+            border-radius: 2.5rem;
+            box-shadow: var(--card-shadow);
             width: 100%;
-            max-width: 420px;
-            padding: 2.5rem;
-            border: 1px solid #f1f5f9;
+            max-width: 400px;
+            padding: 2rem;
+            border: 1px solid rgba(15,23,42,0.05);
         }
+
         .section-box {
-            border-radius: 2rem;
-            padding: 1.75rem;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
         }
+
         .from-style {
-            background-color: #f0fdf4; /* Verde Esmeralda */
-            border: 2px solid #10b981;
+            background: var(--green-bg);
+            border: 1.5px solid var(--green-border);
         }
+
         .to-style {
-            background-color: #fff7ed; /* Naranja Bitcoin */
-            border: 2px solid #f59e0b;
+            background: var(--amber-bg);
+            border: 1.5px solid var(--amber-border);
         }
+
         .swap-trigger {
             background: white;
-            border: 3px solid #f8fafc;
-            width: 54px;
-            height: 54px;
+            border: 2px solid var(--surface);
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: -27px auto;
+            margin: -25px auto;
             position: relative;
             z-index: 30;
             cursor: pointer;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px -4px rgba(15,23,42,0.12);
+            transition: all 0.25s ease;
         }
-        .swap-trigger:active {
-            transform: scale(0.9) rotate(180deg);
-        }
-        input {
+
+        .swap-trigger:hover { box-shadow: 0 12px 24px -4px rgba(15,23,42,0.18); }
+        .swap-trigger:active { transform: scale(0.88) rotate(180deg); }
+
+        /* Input Entrego */
+        input#input-amount {
             background: transparent;
             border: none;
-            font-size: 2.2rem;
-            font-weight: 900;
+            font-family: 'DM Mono', monospace;
+            font-size: 2rem;
+            font-weight: 500;
             width: 100%;
             outline: none;
             color: #064e3b;
+            padding: 0;
+            letter-spacing: -0.02em;
         }
-        .bitcoin-icon {
-            color: #f59e0b;
-            font-size: 2.2rem;
+
+        input#input-amount::placeholder { color: #a7f3d0; }
+
+        /* Resultado Recibo */
+        #display-result {
+            font-family: 'DM Mono', monospace;
+            font-size: 2rem;
+            font-weight: 500;
+            color: #92400e;
+            letter-spacing: -0.02em;
+            line-height: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 100%;
+        }
+
+        /* Selects */
+        select {
+            background: white;
+            border: 1px solid rgba(15,23,42,0.1);
+            border-radius: 0.75rem;
+            padding: 0.35rem 0.6rem;
+            font-size: 0.8rem;
+            font-weight: 700;
+            font-family: 'DM Sans', sans-serif;
+            outline: none;
+            cursor: pointer;
+            color: var(--dark);
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%2364748b'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 8px center;
+            padding-right: 22px;
+            transition: border-color 0.2s;
+        }
+
+        select:hover { border-color: rgba(15,23,42,0.25); }
+
+        /* Label sección */
+        .section-label {
+            font-size: 0.65rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.18em;
+        }
+
+        /* Rate info */
+        #rate-info {
+            font-family: 'DM Mono', monospace;
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: var(--muted);
+            background: var(--surface);
+            padding: 0.7rem 1rem;
+            border-radius: 1rem;
+            border: 1px solid rgba(15,23,42,0.06);
+            letter-spacing: 0.02em;
+            transition: all 0.3s ease;
+        }
+
+        /* Pulse cuando actualiza */
+        #rate-info.updating {
+            opacity: 0.5;
+        }
+
+        /* Botón compartir */
+        #btn-share {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            gap: 0.5rem;
+            padding: 0.9rem;
+            border-radius: 1rem;
+            background: var(--dark);
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        #btn-share:hover { background: #1e293b; transform: translateY(-1px); }
+        #btn-share:active { transform: scale(0.97); }
+
+        /* Icono bitcoin */
+        .bitcoin-icon { color: var(--amber); font-size: 2rem; }
+
+        /* Estado de carga */
+        .spinner {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(100,116,139,0.3);
+            border-top-color: var(--muted);
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            vertical-align: middle;
+            margin-right: 6px;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Animación entrada */
+        .app-card {
+            animation: slideUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(24px) scale(0.97); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* Timestamp */
+        #timestamp {
+            font-size: 0.6rem;
+            color: #cbd5e1;
+            text-align: center;
+            margin-top: 0.5rem;
+            font-family: 'DM Mono', monospace;
         }
     </style>
 </head>
 <body>
 
 <div class="app-card">
-    <div class="text-center mb-8">
+
+    <!-- Header -->
+    <div class="text-center mb-7">
         <div class="flex justify-center items-center gap-2 mb-1">
-            <i class="fa-solid fa-bolt-lightning text-amber-500"></i>
-            <h1 class="text-2xl font-black text-slate-900 tracking-tight">Divisas Libres</h1>
+            <i class="fa-solid fa-bolt-lightning" style="color: var(--amber); font-size: 1rem;"></i>
+            <h1 style="font-size: 1.4rem; font-weight: 900; color: var(--dark); letter-spacing: -0.03em; margin: 0;">Divisas Libres</h1>
         </div>
-        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Fiat & Bitcoin Edition</p>
+        <p style="font-size: 0.55rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.22em; margin: 0;">Fiat & Bitcoin Edition</p>
     </div>
 
     <div class="space-y-4">
         <!-- ORIGEN -->
         <div class="section-box from-style" id="box-from">
             <div class="flex justify-between items-center mb-4">
-                <span class="text-emerald-700 text-[10px] font-black uppercase tracking-widest" id="label-from">Entrego</span>
-                <select id="select-from" class="bg-white/90 rounded-xl px-3 py-1.5 text-sm font-bold border-none outline-none shadow-sm cursor-pointer"></select>
+                <span class="section-label" style="color: #065f46;" id="label-from">Entrego</span>
+                <select id="select-from"></select>
             </div>
-            <div class="flex items-center gap-4">
-                <div id="icon-from" class="w-12 h-12 rounded-full flex items-center justify-center bg-white shadow-inner overflow-hidden"></div>
-                <input type="number" id="input-amount" value="1" inputmode="decimal">
+            <div class="flex items-center gap-3">
+                <div id="icon-from" class="w-11 h-11 rounded-full flex items-center justify-center bg-white overflow-hidden flex-shrink-0" style="box-shadow: 0 2px 8px rgba(0,0,0,0.08);"></div>
+                <input type="text" id="input-amount" value="1,000" inputmode="decimal" placeholder="0" autocomplete="off">
             </div>
         </div>
 
         <!-- SWAP -->
-        <div class="swap-trigger" id="btn-swap">
-            <i class="fa-solid fa-shuffle text-amber-600"></i>
+        <div class="swap-trigger" id="btn-swap" title="Intercambiar divisas">
+            <i class="fa-solid fa-shuffle" style="color: var(--amber); font-size: 0.85rem;"></i>
         </div>
 
         <!-- DESTINO -->
         <div class="section-box to-style" id="box-to">
             <div class="flex justify-between items-center mb-4">
-                <span class="text-amber-700 text-[10px] font-black uppercase tracking-widest" id="label-to">Recibo</span>
-                <select id="select-to" class="bg-white/90 rounded-xl px-3 py-1.5 text-sm font-bold border-none outline-none shadow-sm cursor-pointer"></select>
+                <span class="section-label" style="color: #92400e;" id="label-to">Recibo</span>
+                <select id="select-to"></select>
             </div>
-            <div class="flex items-center gap-4">
-                <div id="icon-to" class="w-12 h-12 rounded-full flex items-center justify-center bg-white shadow-inner overflow-hidden"></div>
-                <div id="display-result" class="text-3xl font-black text-amber-900 truncate">0.00</div>
+            <div class="flex items-center gap-3">
+                <div id="icon-to" class="w-11 h-11 rounded-full flex items-center justify-center bg-white overflow-hidden flex-shrink-0" style="box-shadow: 0 2px 8px rgba(0,0,0,0.08);"></div>
+                <div id="display-result">0.00</div>
             </div>
         </div>
     </div>
 
-    <!-- Info y Leyenda con la firma personalizada -->
-    <div class="mt-8 text-center px-2">
-        <div id="rate-info" class="text-[11px] font-extrabold text-slate-500 bg-slate-50 py-3 px-4 rounded-2xl mb-8 border border-slate-100">
-            Sincronizando con el mercado...
-        </div>
-        
-        <div class="border-t border-slate-100 pt-6">
-            <p class="text-[11px] text-slate-400 leading-relaxed font-medium">
-                <i class="fa-solid fa-heart text-red-400 mr-1"></i>
-                <span class="text-slate-600 font-bold">Conocimiento Abierto.</span> 
-                Esta herramienta es gratuita y libre para todos, siempre :.
-            </p>
-        </div>
+    <!-- Rate info -->
+    <div class="mt-6 text-center">
+        <div id="rate-info"><span class="spinner"></span>Sincronizando con el mercado...</div>
+        <div id="timestamp"></div>
+    </div>
 
-        <button id="btn-share" class="mt-6 flex items-center justify-center w-full gap-2 py-4 rounded-2xl bg-slate-900 text-white font-bold text-xs uppercase tracking-widest hover:bg-slate-800 transition-all active:scale-95 shadow-xl shadow-slate-200">
-            <i class="fa-solid fa-paper-plane text-[10px]"></i> Compartir con la familia
+    <!-- Footer -->
+    <div class="mt-6 border-t pt-5" style="border-color: rgba(15,23,42,0.06);">
+        <p style="font-size: 0.65rem; color: #94a3b8; line-height: 1.7; text-align: center; margin: 0 0 1rem;">
+            <i class="fa-solid fa-heart" style="color: #f87171; font-size: 10px; margin-right: 4px;"></i>
+            <span style="color: #64748b; font-weight: 700;">Conocimiento Abierto.</span>
+            Esta herramienta es gratuita y libre para todos, siempre :.
+        </p>
+
+        <button id="btn-share">
+            <i class="fa-solid fa-paper-plane" style="font-size: 0.65rem;"></i>
+            Compartir 
         </button>
     </div>
 </div>
 
 <script>
+    /* ── Catálogo de divisas ── */
     const currencies = {
-        "BTC": { name: "Bitcoin", flag: null },
-        "USD": { name: "Dólar US", flag: "US" },
-        "MXN": { name: "Peso MX", flag: "MX" },
-        "EUR": { name: "Euro", flag: "EU" },
-        "ARS": { name: "Peso AR", flag: "AR" },
-        "COP": { name: "Peso CO", flag: "CO" },
-        "CLP": { name: "Peso CL", flag: "CL" },
-        "PEN": { name: "Sol PE", flag: "PE" },
-        "BRL": { name: "Real BR", flag: "BR" },
-        "UYU": { name: "Peso UY", flag: "UY" }
+        "BTC": { name: "Bitcoin",   flag: null },
+        "USD": { name: "Dólar US",  flag: "US" },
+        "MXN": { name: "Peso MX",   flag: "MX" },
+        "EUR": { name: "Euro",      flag: "EU" },
+        "ARS": { name: "Peso AR",   flag: "AR" },
+        "COP": { name: "Peso CO",   flag: "CO" },
+        "CLP": { name: "Peso CL",   flag: "CL" },
+        "PEN": { name: "Sol PE",    flag: "PE" },
+        "BRL": { name: "Real BR",   flag: "BR" },
+        "UYU": { name: "Peso UY",   flag: "UY" }
     };
-    
-    let rates = {};
-    const selectFrom = document.getElementById('select-from');
-    const selectTo = document.getElementById('select-to');
-    const inputAmt = document.getElementById('input-amount');
-    const displayRes = document.getElementById('display-result');
-    const rateInfo = document.getElementById('rate-info');
-    const btnShare = document.getElementById('btn-share');
 
+    /* ── Decimales por divisa ── */
+    const DECIMALS = { BTC: 8, CLP: 0, COP: 0, ARS: 0 };
+    const getDecimals = code => DECIMALS[code] ?? 2;
+
+    /* ── Locale fijo en-US para toda la app ── */
+    const LOCALE = 'en-US';
+
+    const fmt = (num, code) =>
+        num.toLocaleString(LOCALE, {
+            minimumFractionDigits: getDecimals(code),
+            maximumFractionDigits: getDecimals(code)
+        });
+
+    const fmtRate = num =>
+        num.toLocaleString(LOCALE, { maximumFractionDigits: 8 });
+
+    /* ── Parseo seguro del input (acepta comas de miles) ── */
+    const parseInput = str => {
+        const clean = str.replace(/,/g, '').trim();
+        return parseFloat(clean) || 0;
+    };
+
+    /* ── Referencias DOM ── */
+    const selectFrom  = document.getElementById('select-from');
+    const selectTo    = document.getElementById('select-to');
+    const inputAmt    = document.getElementById('input-amount');
+    const displayRes  = document.getElementById('display-result');
+    const rateInfo    = document.getElementById('rate-info');
+    const timestamp   = document.getElementById('timestamp');
+
+    let rates = {};
+    let rawAmount = 1000;
+
+    /* ── Poblar selects ── */
     Object.keys(currencies).forEach(c => {
         selectFrom.add(new Option(c, c));
         selectTo.add(new Option(c, c));
     });
+    selectFrom.value = "USD";
+    selectTo.value   = "MXN";
 
-    selectFrom.value = "BTC";
-    selectTo.value = "MXN";
-
+    /* ── Inicialización y fetch de tasas ── */
     async function init() {
+        rateInfo.innerHTML = '<span class="spinner"></span>Sincronizando con el mercado...';
         try {
-            // Obtener Fiat
-            const resFiat = await fetch('https://open.er-api.com/v6/latest/USD');
+            const [resFiat, resBtc] = await Promise.all([
+                fetch('https://open.er-api.com/v6/latest/USD'),
+                fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd')
+            ]);
             const dataFiat = await resFiat.json();
-            rates = dataFiat.rates;
+            const dataBtc  = await resBtc.json();
 
-            // Obtener BTC (CoinGecko)
-            const resBtc = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd');
-            const dataBtc = await resBtc.json();
-            const btcUsd = dataBtc.bitcoin.usd;
-            
-            rates["BTC"] = 1 / btcUsd;
+            rates = dataFiat.rates;
+            rates["BTC"] = 1 / dataBtc.bitcoin.usd;
 
             update();
+
+            /* Actualizar timestamp */
+            const now = new Date();
+            timestamp.innerText = `Actualizado: ${now.toLocaleTimeString(LOCALE, { hour: '2-digit', minute: '2-digit' })}`;
+
+            /* Refresco automático cada 60 s */
+            setTimeout(init, 60_000);
+
         } catch (e) {
-            rateInfo.innerText = "Error de conexión. Reintentando...";
-            setTimeout(init, 4000);
+            rateInfo.innerHTML = '⚠️ Error de conexión. Reintentando...';
+            setTimeout(init, 5_000);
         }
     }
 
+    /* ── Cálculo y render ── */
     function update() {
-        if (!rates[selectFrom.value] || !rates[selectTo.value]) return;
-        
         const from = selectFrom.value;
-        const to = selectTo.value;
-        const amt = parseFloat(inputAmt.value) || 0;
-        
-        const rate = rates[to] / rates[from];
-        const result = amt * rate;
-        
-        const decimals = to === "BTC" ? 8 : 2;
-        displayRes.innerText = result.toLocaleString(undefined, { 
-            minimumFractionDigits: decimals, 
-            maximumFractionDigits: decimals 
-        });
-        
-        rateInfo.innerText = `1 ${from} = ${rate.toLocaleString(undefined, {maximumFractionDigits: 8})} ${to}`;
-        
-        renderIcon('icon-from', from);
-        renderIcon('icon-to', to);
+        const to   = selectTo.value;
 
-        updateBoxStyle('box-from', 'label-from', from);
-        updateBoxStyle('box-to', 'label-to', to);
+        if (!rates[from] || !rates[to]) return;
+
+        const rate   = rates[to] / rates[from];
+        const result = rawAmount * rate;
+
+        /* FIX #1 — locale forzado en resultado */
+        displayRes.innerText = fmt(result, to);
+
+        /* FIX #2 — locale forzado en tipo de cambio */
+        rateInfo.innerText = `1 ${from} = ${fmtRate(rate)} ${to}`;
+
+        renderIcon('icon-from', from);
+        renderIcon('icon-to',   to);
+        updateBoxStyle('box-from', 'label-from', from, 'from');
+        updateBoxStyle('box-to',   'label-to',   to,   'to');
     }
 
-    function renderIcon(elementId, code) {
-        const el = document.getElementById(elementId);
+    function renderIcon(id, code) {
+        const el = document.getElementById(id);
         if (code === "BTC") {
             el.innerHTML = `<i class="fa-brands fa-bitcoin bitcoin-icon"></i>`;
         } else {
-            el.innerHTML = `<img src="https://flagsapi.com/${currencies[code].flag}/flat/64.png" class="w-8 h-8 object-contain">`;
+            el.innerHTML = `<img src="https://flagsapi.com/${currencies[code].flag}/flat/64.png" style="width:28px;height:28px;object-fit:contain;">`;
         }
     }
 
-    function updateBoxStyle(boxId, labelId, code) {
-        const box = document.getElementById(boxId);
+    function updateBoxStyle(boxId, labelId, code, side) {
+        const box   = document.getElementById(boxId);
         const label = document.getElementById(labelId);
         if (code === "BTC") {
             box.className = "section-box to-style";
-            label.className = "text-amber-700 text-[10px] font-black uppercase tracking-widest";
-        } else {
+            label.style.color = "#92400e";
+        } else if (side === 'from') {
             box.className = "section-box from-style";
-            label.className = "text-emerald-700 text-[10px] font-black uppercase tracking-widest";
+            label.style.color = "#065f46";
+        } else {
+            box.className = "section-box to-style";
+            label.style.color = "#92400e";
         }
     }
 
-    inputAmt.addEventListener('input', update);
-    selectFrom.addEventListener('change', update);
-    selectTo.addEventListener('change', update);
-    
+    /* ── Eventos input: FIX #3 — formatear campo Entrego ── */
+    inputAmt.addEventListener('focus', () => {
+        /* Al enfocar: mostrar sólo número plano para editar */
+        inputAmt.value = rawAmount || '';
+        inputAmt.select();
+    });
+
+    inputAmt.addEventListener('blur', () => {
+        /* Al salir: formatear con comas de miles en-US */
+        rawAmount = parseInput(inputAmt.value);
+        inputAmt.value = rawAmount.toLocaleString(LOCALE);
+        update();
+    });
+
+    inputAmt.addEventListener('input', () => {
+        rawAmount = parseInput(inputAmt.value);
+        update();
+    });
+
+    /* ── Swap ── */
     document.getElementById('btn-swap').addEventListener('click', () => {
         const t = selectFrom.value;
         selectFrom.value = selectTo.value;
@@ -252,19 +455,23 @@
         update();
     });
 
-    btnShare.addEventListener('click', () => {
+    selectFrom.addEventListener('change', update);
+    selectTo.addEventListener('change',   update);
+
+    /* ── Compartir ── */
+    document.getElementById('btn-share').addEventListener('click', () => {
         const link = window.location.href;
         const text = `Te comparto esta app de Divisas y Bitcoin que hice. Conocimiento Libre siempre :. ${link}`;
         if (navigator.share) {
-            navigator.share({ title: 'Divisas Libres', text: text, url: link });
+            navigator.share({ title: 'Divisas Libres', text, url: link });
         } else {
             navigator.clipboard.writeText(text);
-            alert("¡Enlace copiado! Ya puedes pegarlo en WhatsApp :.");
+            alert('¡Enlace copiado! Ya puedes pegarlo en WhatsApp :.');
         }
     });
 
+    /* ── Arranque ── */
     init();
 </script>
-
 </body>
 </html>
